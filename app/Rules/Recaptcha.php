@@ -28,7 +28,7 @@ class Recaptcha implements ValidationRule
         }
 
         try {
-            $response = Http::withoutVerifying() // <-- This fixes the SSL error
+            $response = Http::withoutVerifying()
                 ->timeout(30)
                 ->asForm()
                 ->post('https://www.google.com/recaptcha/api/siteverify', [

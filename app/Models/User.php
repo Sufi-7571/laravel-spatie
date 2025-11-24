@@ -21,6 +21,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'google_id',
+        'avatar',
+        'auth_provider',
+        'email_verified_at',
     ];
 
     /**
@@ -54,5 +58,37 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new \App\Notifications\CustomVerifyEmail);
+    }
+
+    /**
+     * Check if user registered via Google
+     */
+    public function isGoogleUser(): bool
+    {
+        return !is_null($this->google_id);
+    }
+
+    /**
+     * Check if user has local password (can login with email/password)
+     */
+    public function hasLocalPassword(): bool
+    {
+        return $this->auth_provider === 'local' || $this->auth_provider === 'both';
+    }
+
+    /**
+     * Check if user can login with Google
+     */
+    public function canLoginWithGoogle(): bool
+    {
+        return $this->auth_provider === 'google' || $this->auth_provider === 'both';
+    }
+
+    /**
+     * Get user's avatar URL or default
+     */
+    public function getAvatarUrl(): string
+    {
+        return $this->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
     }
 }

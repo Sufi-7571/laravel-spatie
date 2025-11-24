@@ -16,7 +16,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @if(config('services.recaptcha.site_key') && config('services.recaptcha.site_key') !== 'skip')
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @endif
 
     <!-- SweetAlert2 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
@@ -67,6 +69,62 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
+        /* Google Button Styles */
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background-color: #ffffff;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .google-btn:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .google-btn:active {
+            transform: translateY(0);
+        }
+
+        .google-btn svg {
+            margin-right: 12px;
+        }
+
+        /* Divider Styles */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+        }
+
+        .divider span {
+            padding: 0 16px;
+            color: #9ca3af;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         /* Custom SweetAlert styling */
         .swal2-popup {
             border-radius: 15px !important;
@@ -110,14 +168,30 @@
                 </div>
 
                 <!-- Forms Wrapper -->
-                <div class="forms-wrapper" style="min-height: 500px;">
+                <div class="forms-wrapper" style="min-height: 580px;">
                     <!-- Login Form -->
                     <div id="loginForm" class="form-container slide-center">
+                        <!-- Google Sign In Button -->
+                        <a href="{{ route('google.redirect') }}" class="google-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                            </svg>
+                            Sign in with Google
+                        </a>
+
+                        <!-- Divider -->
+                        <div class="divider">
+                            <span>or sign in with email</span>
+                        </div>
+
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
 
                             <!-- Email Address -->
-                            <div class="mb-6">
+                            <div class="mb-5">
                                 <label for="login_email" class="block text-sm font-medium text-gray-700 mb-2">
                                     Email Address
                                 </label>
@@ -125,13 +199,10 @@
                                     required autofocus autocomplete="username"
                                     class="input-focus w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                                     placeholder="you@example.com">
-                                @error('email')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <!-- Password -->
-                            <div class="mb-6">
+                            <div class="mb-5">
                                 <label for="login_password" class="block text-sm font-medium text-gray-700 mb-2">
                                     Password
                                 </label>
@@ -139,22 +210,17 @@
                                     autocomplete="current-password"
                                     class="input-focus w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                                     placeholder="••••••••">
-                                @error('password')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <!-- reCAPTCHA -->
-                            <div class="mb-6 flex justify-center">
-                                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}">
+                            @if(config('services.recaptcha.site_key') && config('services.recaptcha.site_key') !== 'skip')
+                                <div class="mb-5 flex justify-center">
+                                    <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
                                 </div>
-                            </div>
-                            @error('g-recaptcha-response')
-                                <p class="mb-4 text-sm text-red-600 text-center">{{ $message }}</p>
-                            @enderror
+                            @endif
 
                             <!-- Remember Me -->
-                            <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center justify-between mb-5">
                                 <label class="flex items-center">
                                     <input type="checkbox" name="remember"
                                         class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
@@ -179,25 +245,38 @@
 
                     <!-- Register Form -->
                     <div id="registerForm" class="form-container slide-right">
+                        <!-- Google Sign Up Button -->
+                        <a href="{{ route('google.redirect') }}" class="google-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                            </svg>
+                            Sign up with Google
+                        </a>
+
+                        <!-- Divider -->
+                        <div class="divider">
+                            <span>or register with email</span>
+                        </div>
+
                         <form method="POST" action="{{ route('register') }}">
                             @csrf
 
                             <!-- Name -->
-                            <div class="mb-6">
+                            <div class="mb-5">
                                 <label for="register_name" class="block text-sm font-medium text-gray-700 mb-2">
                                     Full Name
                                 </label>
                                 <input id="register_name" type="text" name="name" value="{{ old('name') }}"
-                                    required autofocus autocomplete="name"
+                                    required autocomplete="name"
                                     class="input-focus w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                                     placeholder="John Doe">
-                                @error('name')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <!-- Email Address -->
-                            <div class="mb-6">
+                            <div class="mb-5">
                                 <label for="register_email" class="block text-sm font-medium text-gray-700 mb-2">
                                     Email Address
                                 </label>
@@ -205,13 +284,10 @@
                                     required autocomplete="username"
                                     class="input-focus w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                                     placeholder="you@example.com">
-                                @error('email')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <!-- Password -->
-                            <div class="mb-6">
+                            <div class="mb-5">
                                 <label for="register_password" class="block text-sm font-medium text-gray-700 mb-2">
                                     Password
                                 </label>
@@ -219,24 +295,17 @@
                                     autocomplete="new-password"
                                     class="input-focus w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                                     placeholder="••••••••">
-                                @error('password')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <!-- Confirm Password -->
-                            <div class="mb-6">
-                                <label for="password_confirmation"
-                                    class="block text-sm font-medium text-gray-700 mb-2">
+                            <div class="mb-5">
+                                <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
                                     Confirm Password
                                 </label>
                                 <input id="password_confirmation" type="password" name="password_confirmation"
                                     required autocomplete="new-password"
                                     class="input-focus w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                                     placeholder="••••••••">
-                                @error('password_confirmation')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <!-- Submit Button -->
@@ -249,8 +318,11 @@
                 </div>
 
                 <!-- Footer Text -->
-                <div class="mt-6 text-center text-sm text-gray-600">
-                    <p>By continuing, you agree to our Terms of Service and Privacy Policy.</p>
+                <div class="mt-6 text-center text-sm text-gray-500">
+                    <p>By continuing, you agree to our 
+                        <a href="#" class="text-purple-600 hover:underline">Terms of Service</a> and 
+                        <a href="#" class="text-purple-600 hover:underline">Privacy Policy</a>.
+                    </p>
                 </div>
             </div>
         </div>
@@ -264,15 +336,12 @@
             const loginBtn = document.getElementById('loginTabBtn');
             const registerBtn = document.getElementById('registerTabBtn');
 
-            // Slide register form to the right
             registerForm.classList.remove('slide-center');
             registerForm.classList.add('slide-right');
 
-            // Slide login form from the left to center
             loginForm.classList.remove('slide-left');
             loginForm.classList.add('slide-center');
 
-            // Toggle button styles
             loginBtn.classList.add('text-white', 'gradient-bg');
             loginBtn.classList.remove('text-gray-600');
 
@@ -286,15 +355,12 @@
             const loginBtn = document.getElementById('loginTabBtn');
             const registerBtn = document.getElementById('registerTabBtn');
 
-            // Slide login form to the left
             loginForm.classList.remove('slide-center');
             loginForm.classList.add('slide-left');
 
-            // Slide register form from the right to center
             registerForm.classList.remove('slide-right');
             registerForm.classList.add('slide-center');
 
-            // Toggle button styles
             registerBtn.classList.add('text-white', 'gradient-bg');
             registerBtn.classList.remove('text-gray-600');
 
@@ -302,7 +368,6 @@
             loginBtn.classList.add('text-gray-600');
         }
 
-        // Check if there are registration errors and show register form
         @if ($errors->has('name') || $errors->has('password_confirmation') || (old('name') && $errors->any()))
             document.addEventListener('DOMContentLoaded', function() {
                 showRegister();
@@ -315,7 +380,7 @@
 
     <!-- SweetAlert Messages -->
     <script>
-        // Registration success message with email verification notice
+        // Registration success message
         @if (session('registered'))
             Swal.fire({
                 icon: 'success',
@@ -347,11 +412,11 @@
             });
         @endif
 
-        // Email verification status messages
+        // Success status messages (Google login, email verified, etc.)
         @if (session('status'))
             Swal.fire({
                 icon: 'success',
-                title: 'Success!',
+                title: '✅ Success!',
                 text: '{{ session('status') }}',
                 showConfirmButton: true,
                 confirmButtonText: 'OK',
@@ -359,7 +424,19 @@
             });
         @endif
 
-        // Only show login errors (not registration errors)
+        // Error messages (Google login failed, etc.)
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: '❌ Error!',
+                text: '{{ session('error') }}',
+                showConfirmButton: true,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#667eea'
+            });
+        @endif
+
+        // Login errors
         @if ($errors->any() && !$errors->has('name') && !$errors->has('password_confirmation') && !old('name'))
             Swal.fire({
                 icon: 'error',
@@ -380,7 +457,7 @@
             });
         @endif
 
-        // Show registration errors
+        // Registration errors
         @if (($errors->has('name') || $errors->has('password_confirmation') || old('name')) && $errors->any())
             Swal.fire({
                 icon: 'error',
