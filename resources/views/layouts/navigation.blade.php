@@ -15,15 +15,20 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-white hover:text-purple-200">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    
+
                     <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" class="text-white hover:text-purple-200">
                         {{ __('Products') }}
                     </x-nav-link>
 
                     @role('admin')
-                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" class="text-white hover:text-purple-200">
-                            {{ __('Users') }}
-                        </x-nav-link>
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" class="text-white hover:text-purple-200">
+                        {{ __('Users') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.index')" class="text-white hover:text-purple-200">
+                        {{ __('Manage Reviews') }}
+                    </x-nav-link>
+
                     @endrole
                 </div>
             </div>
@@ -53,7 +58,7 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
+                                onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -80,15 +85,15 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-white hover:bg-purple-700">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            
+
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" class="text-white hover:bg-purple-700">
                 {{ __('Products') }}
             </x-responsive-nav-link>
 
             @role('admin')
-                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" class="text-white hover:bg-purple-700">
-                    {{ __('Users') }}
-                </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" class="text-white hover:bg-purple-700">
+                {{ __('Users') }}
+            </x-responsive-nav-link>
             @endrole
         </div>
 
@@ -109,7 +114,7 @@
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();" class="text-white hover:bg-purple-700">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>

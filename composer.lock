@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f0a069e1209f1a0c4858972f9f4d3014",
+    "content-hash": "4376e1bf35e17d0097c14e1099f0d345",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -6876,6 +6876,45 @@
                 }
             ],
             "time": "2024-11-21T01:49:47+00:00"
+        },
+        {
+            "name": "voltic/product-reviews",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "./packages/voltic/product-reviews",
+                "reference": "dc5911f177535ea21fe5ccd230b807a3139b714e"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0|^12.0",
+                "php": "^8.1|^8.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Voltic\\ProductReviews\\ProductReviewsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Voltic\\ProductReviews\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sufiyan Mirza",
+                    "email": "sufimiz.dev@gmail.com"
+                }
+            ],
+            "description": "Product reviews and ratings package for Laravel",
+            "transport-options": {
+                "relative": true
+            }
         }
     ],
     "packages-dev": [
@@ -9304,7 +9343,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "voltic/product-reviews": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
