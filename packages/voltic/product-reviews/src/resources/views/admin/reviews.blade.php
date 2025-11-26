@@ -34,11 +34,11 @@
                             @forelse($reviews as $review)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $review->product->name }}</div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $review->product->name ?? 'Deleted Product' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $review->user->name }}</div>
-                                        <div class="text-sm text-gray-500">{{ $review->user->email }}</div>
+                                        <div class="text-sm text-gray-900">{{ $review->user->name ?? 'Deleted User' }}</div>
+                                        <div class="text-sm text-gray-500">{{ $review->user->email ?? 'N/A' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex text-yellow-400">
@@ -52,7 +52,7 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="text-sm text-gray-900 font-semibold">{{ $review->title }}</div>
+                                        <div class="text-sm text-gray-900 font-semibold">{{ $review->title ?? 'No Title' }}</div>
                                         <div class="text-sm text-gray-500">{{ Str::limit($review->comment, 50) }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -103,4 +103,20 @@
             </div>
         </div>
     </div>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+
+    @if(session('status'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('status') }}',
+                confirmButtonColor: '#667eea'
+            });
+        });
+    </script>
+    @endif
 </x-app-layout>
