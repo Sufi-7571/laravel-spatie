@@ -16,19 +16,59 @@
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border-t-4 border-blue-600">
                 <div class="p-8 text-gray-900">
-                    <!-- Product Header -->
+
+                    <!-- Product Header with Image -->
                     <div class="mb-8 pb-6 border-b-2 border-gray-100">
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <h3 class="text-3xl font-bold text-gray-900 mb-2">{{ $product->name }}</h3>
-                                <p class="text-gray-600 text-lg">
-                                    {{ $product->description ?? 'No description available' }}</p>
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <!-- Product Image -->
+                            <div class="md:w-1/3">
+                                <div class="relative rounded-xl overflow-hidden shadow-lg bg-gray-100">
+                                    <img src="{{ $product->getImageUrl() }}" alt="{{ $product->name }}"
+                                        class="w-full h-64 md:h-80 object-cover">
+                                    @if (!$product->hasImage())
+                                        <div class="absolute inset-0 flex items-center justify-center bg-gray-200">
+                                            <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Product Info -->
+                            <div class="md:w-2/3">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <span
+                                            class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+                                            #{{ $product->id }}
+                                        </span>
+                                    </div>
+                                    <span
+                                        class="px-3 py-1 rounded-full text-xs font-semibold {{ $product->stock > 10 ? 'bg-green-100 text-green-800' : ($product->stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                        {{ $product->stock > 0 ? ($product->stock > 10 ? 'In Stock' : 'Low Stock') : 'Out of Stock' }}
+                                    </span>
+                                </div>
+
+                                <h3 class="text-3xl font-bold text-gray-900 mb-3">{{ $product->name }}</h3>
+
+                                <p class="text-gray-600 text-lg mb-4">
+                                    {{ $product->description ?? 'No description available' }}
+                                </p>
+
+                                <!-- Price -->
+                                <div class="mb-4">
+                                    <span
+                                        class="text-4xl font-bold text-green-600">${{ number_format($product->price, 2) }}</span>
+                                </div>
 
                                 <!-- Rating Display -->
-                                <div class="flex items-center mt-3">
+                                <div class="flex items-center">
                                     <div class="flex text-yellow-400">
                                         @php
                                             $avgRating = $product->averageRating();
@@ -66,9 +106,6 @@
                                         {{ Str::plural('review', $product->reviewsCount()) }})</span>
                                 </div>
                             </div>
-                            <span class="px-4 py-2 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-                                #{{ $product->id }}
-                            </span>
                         </div>
                     </div>
 
@@ -225,7 +262,7 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
+                    <div class="flex flex-wrap items-center justify-end gap-3 pt-6 border-t border-gray-200">
                         <a href="{{ route('products.index') }}"
                             class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5">
                             <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor"
@@ -242,7 +279,7 @@
                                 <path
                                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
-                            All Reviews ({{ $product->reviewsCount() }})
+                            Reviews ({{ $product->reviewsCount() }})
                         </a>
 
                         @can('download product pdf')
@@ -253,7 +290,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                Download PDF
+                                PDF
                             </a>
                         @endcan
 

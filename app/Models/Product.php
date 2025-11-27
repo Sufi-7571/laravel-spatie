@@ -16,6 +16,8 @@ class Product extends Model
         'description',
         'price',
         'stock',
+        'image_url',
+        'image_public_id',
     ];
 
     protected $dates = ['deleted_at'];
@@ -50,5 +52,21 @@ class Product extends Model
     public function reviewsCount()
     {
         return $this->approvedReviews()->count();
+    }
+
+    /**
+     * Check if product has an image
+     */
+    public function hasImage(): bool
+    {
+        return !empty($this->image_url);
+    }
+
+    /**
+     * Get image URL or default placeholder
+     */
+    public function getImageUrl(): string
+    {
+        return $this->image_url ?? 'https://via.placeholder.com/500x500?text=No+Image';
     }
 }

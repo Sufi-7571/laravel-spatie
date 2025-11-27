@@ -9,7 +9,7 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border-t-4 border-indigo-600">
                 <div class="p-8 text-gray-900">
-                    <form action="{{ route('products.update', $product) }}" method="POST">
+                    <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -51,6 +51,78 @@
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 hover:shadow-md"
                                 placeholder="Enter product description (optional)">{{ old('description', $product->description) }}</textarea>
                             @error('description')
+                                <p class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+
+                        <!-- Image Upload Section -->
+                        <div class="mb-6">
+                            <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Product Image
+                            </label>
+
+                            <!-- Current Image -->
+                            @if ($product->hasImage())
+                                <div class="mb-4 p-4 bg-gray-50 rounded-lg" id="current-image-section">
+                                    <p class="text-sm text-gray-600 mb-2">Current Image:</p>
+                                    <div class="flex items-start gap-4">
+                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                                            class="w-32 h-32 object-cover rounded-lg shadow">
+                                        <div class="flex flex-col gap-2">
+                                            <label
+                                                class="flex items-center text-sm text-red-600 cursor-pointer hover:text-red-800">
+                                                <input type="checkbox" name="remove_image" value="1"
+                                                    class="mr-2 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                                                    id="remove-image-checkbox">
+                                                Remove current image
+                                            </label>
+                                            <p class="text-xs text-gray-500">Or upload a new image below to replace it
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Upload New Image -->
+                            <div class="mt-2">
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="image"
+                                        class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-300"
+                                        id="dropzone">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6"
+                                            id="upload-placeholder">
+                                            <svg class="w-10 h-10 mb-3 text-gray-400" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                            </svg>
+                                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to
+                                                    upload</span> or drag and drop</p>
+                                            <p class="text-xs text-gray-500">PNG, JPG, GIF or WebP (MAX. 2MB)</p>
+                                        </div>
+                                        <div class="hidden" id="image-preview-container">
+                                            <img id="image-preview" class="max-h-40 rounded-lg" src=""
+                                                alt="Preview">
+                                            <p class="text-sm text-green-600 mt-2">New image selected</p>
+                                        </div>
+                                        <input id="image" name="image" type="file" class="hidden"
+                                            accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" />
+                                    </label>
+                                </div>
+                            </div>
+                            @error('image')
                                 <p class="mt-2 text-sm text-red-600 flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
@@ -134,4 +206,68 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            // Image Preview
+            document.getElementById('image').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('image-preview').src = e.target.result;
+                        document.getElementById('upload-placeholder').classList.add('hidden');
+                        document.getElementById('image-preview-container').classList.remove('hidden');
+
+                        // Uncheck remove image if user selects new image
+                        const removeCheckbox = document.getElementById('remove-image-checkbox');
+                        if (removeCheckbox) {
+                            removeCheckbox.checked = false;
+                        }
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Drag and drop
+            const dropzone = document.getElementById('dropzone');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropzone.classList.add('border-indigo-500', 'bg-indigo-50');
+            }
+
+            function unhighlight(e) {
+                dropzone.classList.remove('border-indigo-500', 'bg-indigo-50');
+            }
+
+            dropzone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                document.getElementById('image').files = files;
+
+                // Trigger change event
+                const event = new Event('change');
+                document.getElementById('image').dispatchEvent(event);
+            }
+        </script>
+    @endpush
 </x-app-layout>
