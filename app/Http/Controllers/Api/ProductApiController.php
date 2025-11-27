@@ -13,16 +13,27 @@ class ProductApiController extends Controller
      * Display a listing of products
      * GET /api/products
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $products = Product::with('approvedReviews')
-                ->paginate(10);
+            $search = $request->input('search');
+
+            $products = Product::query()
+                ->when($search, function ($query, $search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhere('price', 'like', "%{$search}%");
+                })
+                ->with('approvedReviews')
+                ->latest()
+                ->paginate(10)
+                ->withQueryString();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Products fetched successfully',
+                'message' => $search ? "Products matching '{$search}'" : 'Products fetched successfully',
                 'data' => $products->items(),
+                'search' => $search,
                 'pagination' => [
                     'current_page' => $products->currentPage(),
                     'last_page' => $products->lastPage(),
