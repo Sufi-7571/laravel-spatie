@@ -10,22 +10,34 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
 
-    public function index(Request $request)
-    {
-        $search = $request->input('search');
-
-        $products = Product::query()
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('price', 'like', "%{$search}%");
-            })
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
-        return view('products.index', compact('products', 'search'));
-    }
+   public function index(Request $request)
+{
+    $search = $request->input('search');
+    $rating = $request->input('rating');
+    
+    $products = Product::query()
+        ->when($search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('price', 'like', "%{$search}%");
+            });
+        })
+        ->when($rating, function ($query, $rating) {
+            $query->whereIn('id', function ($subQuery) use ($rating) {
+                $subQuery->select('product_id')
+                    ->from('reviews')
+                    ->where('is_approved', true)
+                    ->groupBy('product_id')
+                    ->havingRaw('AVG(rating) >= ?', [$rating]);
+            });
+        })
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+    
+    return view('products.index', compact('products', 'search', 'rating'));
+}
 
     public function create()
     {

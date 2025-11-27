@@ -21,13 +21,15 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border-t-4 border-purple-600">
                 <div class="p-6 text-gray-900">
-                    <!-- Search & Role Section -->
-                    <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <!-- Search Bar -->
-                        <form action="{{ route('products.index') }}" method="GET" class="flex-1 max-w-md">
-                            <div class="relative">
+                    <!-- Search, Filter & Role Section -->
+                    <div class="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <!-- Search & Filter Form -->
+                        <form action="{{ route('products.index') }}" method="GET"
+                            class="flex flex-col sm:flex-row gap-3 flex-1">
+                            <!-- Search Bar -->
+                            <div class="relative flex-1 max-w-md">
                                 <input type="text" name="search" value="{{ $search ?? '' }}"
-                                    placeholder="Search products by name, description, or price..."
+                                    placeholder="Search products..."
                                     class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
@@ -36,16 +38,60 @@
                                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
                                 </div>
-                                @if ($search)
-                                    <a href="{{ route('products.index') }}"
-                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </a>
-                                @endif
                             </div>
+
+                            <!-- Rating Filter -->
+                            <div class="relative">
+                                <select name="rating" onchange="this.form.submit()"
+                                    class="appearance-none pl-10 pr-8 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition bg-white cursor-pointer">
+                                    <option value="">All Ratings</option>
+                                    <option value="5" {{ ($rating ?? '') == '5' ? 'selected' : '' }}>⭐⭐⭐⭐⭐ 5 Stars
+                                    </option>
+                                    <option value="4" {{ ($rating ?? '') == '4' ? 'selected' : '' }}>⭐⭐⭐⭐ 4+ Stars
+                                    </option>
+                                    <option value="3" {{ ($rating ?? '') == '3' ? 'selected' : '' }}>⭐⭐⭐ 3+ Stars
+                                    </option>
+                                    <option value="2" {{ ($rating ?? '') == '2' ? 'selected' : '' }}>⭐⭐ 2+ Stars
+                                    </option>
+                                    <option value="1" {{ ($rating ?? '') == '1' ? 'selected' : '' }}>⭐ 1+ Stars
+                                    </option>
+                                </select>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Search Button -->
+                            <button type="submit"
+                                class="gradient-bg text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                Search
+                            </button>
+
+                            <!-- Clear Filters -->
+                            @if ($search || $rating)
+                                <a href="{{ route('products.index') }}"
+                                    class="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Clear
+                                </a>
+                            @endif
                         </form>
 
                         <!-- User Role Badge -->
@@ -65,15 +111,20 @@
                     </div>
 
                     <!-- Search Results Info -->
-                    @if ($search)
+                    @if ($search || $rating)
                         <div class="mb-4 flex items-center justify-between bg-purple-50 rounded-lg px-4 py-2">
                             <p class="text-sm text-purple-700">
-                                <span class="font-semibold">{{ $products->total() }}</span> results found for "<span
-                                    class="font-semibold">{{ $search }}</span>"
+                                <span class="font-semibold">{{ $products->total() }}</span> results found
+                                @if ($search)
+                                    for "<span class="font-semibold">{{ $search }}</span>"
+                                @endif
+                                @if ($rating)
+                                    with <span class="font-semibold">{{ $rating }}+ stars</span>
+                                @endif
                             </p>
                             <a href="{{ route('products.index') }}"
                                 class="text-sm text-purple-600 hover:text-purple-800 font-medium">
-                                Clear search
+                                Clear all filters
                             </a>
                         </div>
                     @endif

@@ -26,6 +26,45 @@
                                 <h3 class="text-3xl font-bold text-gray-900 mb-2">{{ $product->name }}</h3>
                                 <p class="text-gray-600 text-lg">
                                     {{ $product->description ?? 'No description available' }}</p>
+
+                                <!-- Rating Display -->
+                                <div class="flex items-center mt-3">
+                                    <div class="flex text-yellow-400">
+                                        @php
+                                            $avgRating = $product->averageRating();
+                                            $fullStars = floor($avgRating);
+                                            $hasHalfStar = $avgRating - $fullStars >= 0.5;
+                                        @endphp
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            @if ($i <= $fullStars)
+                                                <svg class="w-6 h-6 fill-current" viewBox="0 0 20 20">
+                                                    <path
+                                                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                                </svg>
+                                            @elseif($i == $fullStars + 1 && $hasHalfStar)
+                                                <svg class="w-6 h-6 fill-current text-yellow-400" viewBox="0 0 20 20">
+                                                    <defs>
+                                                        <linearGradient id="halfGrad">
+                                                            <stop offset="50%" stop-color="currentColor" />
+                                                            <stop offset="50%" stop-color="#D1D5DB" />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <path fill="url(#halfGrad)"
+                                                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                                </svg>
+                                            @else
+                                                <svg class="w-6 h-6 fill-current text-gray-300" viewBox="0 0 20 20">
+                                                    <path
+                                                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                                </svg>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <span
+                                        class="ml-2 text-lg font-semibold text-gray-700">{{ number_format($avgRating, 1) }}</span>
+                                    <span class="ml-2 text-gray-500">({{ $product->reviewsCount() }}
+                                        {{ Str::plural('review', $product->reviewsCount()) }})</span>
+                                </div>
                             </div>
                             <span class="px-4 py-2 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
                                 #{{ $product->id }}
@@ -34,7 +73,7 @@
                     </div>
 
                     <!-- Product Details Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div
                             class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
                             <div class="flex items-center mb-2">
@@ -60,6 +99,20 @@
                             </div>
                             <p class="text-3xl font-bold text-purple-600">{{ $product->stock }}
                                 <span class="text-lg font-normal text-purple-500">units</span>
+                            </p>
+                        </div>
+
+                        <div
+                            class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl border border-yellow-200">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <p class="text-sm font-medium text-yellow-700">Rating</p>
+                            </div>
+                            <p class="text-3xl font-bold text-yellow-600">{{ number_format($avgRating, 1) }}
+                                <span class="text-lg font-normal text-yellow-500">/ 5</span>
                             </p>
                         </div>
                     </div>
@@ -91,6 +144,86 @@
                         </div>
                     </div>
 
+                    <!-- Reviews Section -->
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-bold text-gray-800">Customer Reviews</h4>
+                            <a href="{{ route('reviews.create', $product) }}"
+                                class="text-purple-600 hover:text-purple-800 font-medium text-sm">
+                                Write a Review →
+                            </a>
+                        </div>
+
+                        @php
+                            $reviews = $product->approvedReviews()->with('user')->latest()->take(5)->get();
+                        @endphp
+
+                        @if ($reviews->count() > 0)
+                            <div class="space-y-4">
+                                @foreach ($reviews as $review)
+                                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                                                    {{ strtoupper(substr($review->user->name ?? 'U', 0, 1)) }}
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="font-semibold text-gray-800">
+                                                        {{ $review->user->name ?? 'Unknown User' }}</p>
+                                                    <div class="flex text-yellow-400">
+                                                        @for ($i = 1; $i <= 5; $i++)
+                                                            @if ($i <= $review->rating)
+                                                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                                                                    <path
+                                                                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                                                </svg>
+                                                            @else
+                                                                <svg class="w-4 h-4 fill-current text-gray-300"
+                                                                    viewBox="0 0 20 20">
+                                                                    <path
+                                                                        d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                                                </svg>
+                                                            @endif
+                                                        @endfor
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span
+                                                class="text-xs text-gray-500">{{ $review->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        @if ($review->title)
+                                            <p class="font-semibold text-gray-800 mb-1">{{ $review->title }}</p>
+                                        @endif
+                                        <p class="text-gray-600">{{ $review->comment }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            @if ($product->reviewsCount() > 5)
+                                <div class="mt-4 text-center">
+                                    <a href="{{ route('reviews.index', $product) }}"
+                                        class="text-purple-600 hover:text-purple-800 font-medium">
+                                        View all {{ $product->reviewsCount() }} reviews →
+                                    </a>
+                                </div>
+                            @endif
+                        @else
+                            <div class="bg-gray-50 rounded-xl p-8 text-center">
+                                <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                </svg>
+                                <p class="text-gray-500 mb-3">No reviews yet. Be the first to review this product!</p>
+                                <a href="{{ route('reviews.create', $product) }}"
+                                    class="inline-block gradient-bg text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition">
+                                    Write a Review
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+
                     <!-- Action Buttons -->
                     <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
                         <a href="{{ route('products.index') }}"
@@ -101,6 +234,15 @@
                                     d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                             Back
+                        </a>
+
+                        <a href="{{ route('reviews.index', $product) }}"
+                            class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
+                            <svg class="inline-block w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            All Reviews ({{ $product->reviewsCount() }})
                         </a>
 
                         @can('download product pdf')
