@@ -90,10 +90,10 @@ class UserController extends Controller
     {
         $roles = Role::all();
         $permissions = Permission::all();
-        
+
         // Load user's DIRECT permissions (not inherited from role)
         $user->load('permissions');
-        
+
         return view('users.edit', compact('user', 'roles', 'permissions'));
     }
 

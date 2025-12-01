@@ -18,22 +18,17 @@ class DashboardController extends Controller
         $totalReviews = Review::count();
         $pendingReviews = Review::where('is_approved', false)->count();
 
-        // Calculate total revenue (sum of all product prices * stock)
         $totalRevenue = Product::sum(DB::raw('price * stock'));
 
-        // Low stock products (stock < 10)
         $lowStockCount = Product::where('stock', '<', 10)->count();
 
-        // Recent Products (last 5)
         $recentProducts = Product::latest()->take(5)->get();
 
-        // Recent Reviews (last 5)
         $recentReviews = Review::with(['product', 'user'])
             ->latest()
             ->take(5)
             ->get();
 
-        // Recent Users (last 5)
         $recentUsers = User::latest()->take(5)->get();
 
         // Products by Stock Status
@@ -41,7 +36,6 @@ class DashboardController extends Controller
         $lowStock = Product::where('stock', '>', 0)->where('stock', '<=', 10)->count();
         $outOfStock = Product::where('stock', '<=', 0)->count();
 
-        // Top Rated Products (by average rating)
         $topProducts = Product::withAvg('approvedReviews', 'rating')
             ->having('approved_reviews_avg_rating', '>', 0)
             ->orderByDesc('approved_reviews_avg_rating')
