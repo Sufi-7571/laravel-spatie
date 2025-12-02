@@ -35,13 +35,8 @@ class CloudinaryService
             $filePath = storage_path('app/' . $filePath);
         }
 
-        // Generate signature
-        $params = [
-            'folder' => $folder,
-            'timestamp' => $timestamp,
-        ];
-        ksort($params);
-        $signatureString = http_build_query($params) . $this->apiSecret;
+        // Generate signature (manal signaures)
+        $signatureString = "folder={$folder}&timestamp={$timestamp}{$this->apiSecret}";
         $signature = sha1($signatureString);
 
         // Prepare the upload URL
@@ -115,13 +110,8 @@ class CloudinaryService
         try {
             $timestamp = time();
 
-            // Generate signature
-            $params = [
-                'public_id' => $publicId,
-                'timestamp' => $timestamp,
-            ];
-            ksort($params);
-            $signatureString = http_build_query($params) . $this->apiSecret;
+            // Generate signature (manual signatures)
+            $signatureString = "public_id={$publicId}&timestamp={$timestamp}{$this->apiSecret}";
             $signature = sha1($signatureString);
 
             $url = "https://api.cloudinary.com/v1_1/{$this->cloudName}/image/destroy";

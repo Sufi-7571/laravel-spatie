@@ -49,12 +49,10 @@ class Recaptcha implements ValidationRule
                 }
 
                 Log::info('reCAPTCHA: Verification passed');
-
             } else {
                 Log::error('reCAPTCHA: API request failed', ['response' => $response->body()]);
                 $fail('reCAPTCHA verification failed. Please try again.');
             }
-
         } catch (\Exception $e) {
             Log::error('reCAPTCHA error: ' . $e->getMessage());
             $fail('reCAPTCHA verification failed. Please try again.');
