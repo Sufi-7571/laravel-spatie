@@ -18,6 +18,7 @@ class Product extends Model
         'stock',
         'image_url',
         'image_public_id',
+        'category_id',
     ];
 
     protected $dates = ['deleted_at'];
@@ -68,5 +69,13 @@ class Product extends Model
     public function getImageUrl(): string
     {
         return $this->image_url ?? 'https://via.placeholder.com/500x500?text=No+Image';
+    }
+
+    /**
+     * Relationship with Category model
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

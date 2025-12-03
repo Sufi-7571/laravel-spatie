@@ -69,6 +69,7 @@
                                     <option value="1" {{ ($rating ?? '') == '1' ? 'selected' : '' }}>⭐ 1+ Stars
                                     </option>
                                 </select>
+                                
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path
@@ -149,6 +150,9 @@
                                     <th
                                         class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
                                         Product</th>
+                                   <th
+                                        class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                        Category</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
                                         Price</th>
@@ -180,6 +184,11 @@
                                                     <div class="text-xs text-gray-500">#{{ $product->id }}</div>
                                                 </div>
                                             </div>
+                                        </td>
+
+                                        <!-- Category -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {{ $product->category ? $product->category->name : 'Uncategorized' }}
                                         </td>
 
                                         <!-- Price -->

@@ -61,6 +61,7 @@
                                     {{ $product->description ?? 'No description available' }}
                                 </p>
 
+
                                 <!-- Price -->
                                 <div class="mb-4">
                                     <span
@@ -105,9 +106,23 @@
                                     <span class="ml-2 text-gray-500">({{ $product->reviewsCount() }}
                                         {{ Str::plural('review', $product->reviewsCount()) }})</span>
                                 </div>
+
+                                <div class="flex items-center mt-5">
+                                    <svg class="w-4 h-4 text-gray-500 mr-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 7h18M3 12h18M3 17h18" />
+                                    </svg>
+                                    <span class="text-gray-600 font-semibold">Category:</span>
+                                    <span class="ml-1 text-gray-800">
+                                        {{ $product->category ? $product->category->name : 'Uncategorized' }}
+                                    </span>
+                                </div>
+
                             </div>
                         </div>
                     </div>
+                    
 
                     <!-- Product Details Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

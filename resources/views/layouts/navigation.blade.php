@@ -20,7 +20,12 @@
                         {{ __('Products') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')" class="text-white hover:text-purple-200">
+                        {{ __('Categories') }}
+                    </x-nav-link>
+
                     @role('admin')
+
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" class="text-white hover:text-purple-200">
                         {{ __('Users') }}
                     </x-nav-link>

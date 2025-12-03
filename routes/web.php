@@ -1,10 +1,11 @@
 <?php
 
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -32,6 +33,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // List all products
     Route::get('/products', [ProductController::class, 'index'])
         ->name('products.index');
+    // Product category routes
+    Route::resource('categories', CategoryController::class);
 
     // Trash routes (for viewing deleted products)
     // Route::middleware(['permission:delete products'])->group(function () {
