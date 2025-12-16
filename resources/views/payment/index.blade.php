@@ -41,7 +41,7 @@
                                             Date</th>
                                         <th
                                             class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                            Session ID</th>
+                                            Details</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
