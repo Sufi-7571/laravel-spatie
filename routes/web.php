@@ -82,6 +82,8 @@ Route::get('/payment/success', [StripePaymentController::class, 'success'])
     ->name('payment.success');
 Route::get('/payment/cancel', [StripePaymentController::class, 'cancel'])
     ->name('payment.cancel');
+Route::get('/payment/{payment}', [StripePaymentController::class, 'show'])
+    ->name('payment.show');
 
 
 Route::middleware('auth')->group(function () {
