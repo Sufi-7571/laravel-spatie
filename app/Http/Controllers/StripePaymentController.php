@@ -6,12 +6,17 @@ use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use App\Models\Cart;
+use App\Models\Payment;
 
 class StripePaymentController extends Controller
 {
     public function index()
     {
-        return view('payment.index');
+        $payments = Payment::where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('payment.index', compact('payments'));
     }
 
     public function process(Request $request)
@@ -31,8 +36,17 @@ class StripePaymentController extends Controller
                 'quantity' => 1,
             ]],
             'mode' => 'payment',
-            'success_url' => route('payment.success') . '?clear_cart=1',
+            'success_url' => route('payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('payment.cancel'),
+        ]);
+
+        Payment::create([
+            'user_id' => auth()->id(),
+            'stripe_session_id' => $session->id,  // This was missing
+            'product_name' => $request->product_name ?? 'Product',
+            'amount' => $request->amount,
+            'currency' => 'usd',
+            'status' => 'pending'
         ]);
 
         return redirect($session->url);
@@ -40,15 +54,28 @@ class StripePaymentController extends Controller
 
     public function success(Request $request)
     {
-        if ($request->clear_cart) {
-            Cart::where('user_id', auth()->id())->delete();
+        if ($request->session_id) {
+            $payment = Payment::where('stripe_session_id', $request->session_id)->first();
+            if ($payment) {
+                $payment->update(['status' => 'completed']);
+                Cart::where('user_id', auth()->id())->delete();
+            }
         }
-        
+
         return view('payment.success');
     }
 
     public function cancel()
     {
         return view('payment.cancel');
+    }
+
+    public function show(Payment $payment)
+    {
+        if ($payment->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        return view('payment.show', compact('payment'));
     }
 }

@@ -1,59 +1,130 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl leading-tight">
-            {{ __('Stripe Payment') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl leading-tight">
+                {{ __('Payment History') }}
+            </h2>
+            <a href="{{ route('cart.index') }}"
+                class="gradient-bg text-white font-bold py-2 px-4 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Go to Cart
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border-t-4 border-purple-600">
-                <div class="p-8">
-                    <div class="flex items-center mb-6">
-                        <svg class="w-8 h-8 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                        </svg>
-                        <h3 class="text-2xl font-bold text-gray-900">Payment Details</h3>
-                    </div>
-
-                    <form action="{{ route('payment.process') }}" method="POST" class="space-y-6">
-                        @csrf
-
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Product Name</label>
-                            <input type="text" name="product_name" required
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+                <div class="p-6">
+                    @if ($payments->count() > 0)
+                        <div class="overflow-x-auto rounded-lg border border-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gradient-to-r from-purple-600 to-indigo-600">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                            ID</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                            Product</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                            Amount</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                            Status</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                            Date</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                            Session ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach ($payments as $payment)
+                                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="text-sm font-semibold text-gray-900">#{{ $payment->id }}</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-gray-900">{{ $payment->product_name }}</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="text-sm text-green-600 font-bold">${{ number_format($payment->amount, 2) }}</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                @if ($payment->status == 'completed')
+                                                    <span
+                                                        class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                                        <svg class="inline-block w-3 h-3 mr-1" fill="currentColor"
+                                                            viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd"
+                                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                        Completed
+                                                    </span>
+                                                @elseif($payment->status == 'pending')
+                                                    <span
+                                                        class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                                        <svg class="inline-block w-3 h-3 mr-1" fill="currentColor"
+                                                            viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd"
+                                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                        Pending
+                                                    </span>
+                                                @else
+                                                    <span
+                                                        class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                                        <svg class="inline-block w-3 h-3 mr-1" fill="currentColor"
+                                                            viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd"
+                                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                        Failed
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="text-sm text-gray-500">{{ $payment->created_at->format('M d, Y h:i A') }}</span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span
+                                                    class="text-xs text-gray-400 font-mono">{{ Str::limit($payment->stripe_session_id, 20) }}</span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Amount (USD)</label>
-                            <div class="relative">
-                                <span
-                                    class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold">$</span>
-                                <input type="number" name="amount" step="0.01" required
-                                    class="w-full pl-8 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
-                            </div>
+                        <div class="mt-6">
+                            {{ $payments->links() }}
                         </div>
-
-                        <button type="submit"
-                            class="w-full gradient-bg text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @else
+                        <div class="text-center py-12">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Pay Now with Stripe
-                        </button>
-                    </form>
-
-                    <div class="mt-6 flex items-center justify-center gap-4 text-sm text-gray-500">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span>Secured by Stripe</span>
-                    </div>
+                            <p class="mt-4 text-gray-500 font-medium">No payment history found.</p>
+                            <a href="{{ route('cart.index') }}"
+                                class="mt-4 inline-block gradient-bg text-white font-bold py-2 px-6 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                                Start Shopping
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
