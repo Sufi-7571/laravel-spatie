@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use App\Models\Cart;
 
 class StripePaymentController extends Controller
 {
@@ -30,15 +31,19 @@ class StripePaymentController extends Controller
                 'quantity' => 1,
             ]],
             'mode' => 'payment',
-            'success_url' => route('payment.success'),
+            'success_url' => route('payment.success') . '?clear_cart=1',
             'cancel_url' => route('payment.cancel'),
         ]);
 
         return redirect($session->url);
     }
 
-    public function success()
+    public function success(Request $request)
     {
+        if ($request->clear_cart) {
+            Cart::where('user_id', auth()->id())->delete();
+        }
+        
         return view('payment.success');
     }
 

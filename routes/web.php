@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -29,23 +30,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::resource('users', UserController::class);
 });
 
-// ALL Product Routes require authentication and email verification
+// ALL Product Routes require
 Route::middleware(['auth', 'verified'])->group(function () {
-    // List all products
     Route::get('/products', [ProductController::class, 'index'])
         ->name('products.index');
     // Product category routes
     Route::resource('categories', CategoryController::class);
-
-    // Trash routes (for viewing deleted products)
-    // Route::middleware(['permission:delete products'])->group(function () {
-    //     Route::get('/products/trash', [ProductController::class, 'trash'])
-    //         ->name('products.trash');
-    //     Route::post('/products/{id}/restore', [ProductController::class, 'restore'])
-    //         ->name('products.restore');
-    //     Route::delete('/products/{id}/force-delete', [ProductController::class, 'forceDelete'])
-    //         ->name('products.forceDelete');
-    // });
 
     // CREATE routes
     Route::middleware(['permission:create products'])->group(function () {
@@ -55,25 +45,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('products.store');
     });
 
-    // PDF Download route (with permission check)
+    // PDF Download route
     Route::middleware(['permission:download product pdf'])->group(function () {
         Route::get('/products/{product}/download-pdf', [ProductController::class, 'downloadPdf'])
             ->name('products.downloadPdf');
     });
 
-    // Show single product (AFTER create route)
     Route::get('/products/{product}', [ProductController::class, 'show'])
         ->name('products.show');
 
-    // EDIT routes (AFTER show route or use /products/{product}/edit pattern)
     Route::middleware(['permission:edit products'])->group(function () {
         Route::get('/products/{product}/edit', [ProductController::class, 'edit'])
             ->name('products.edit');
         Route::put('/products/{product}', [ProductController::class, 'update'])
             ->name('products.update');
     });
-
-    // DELETE route (now soft delete)
     Route::middleware(['permission:delete products'])->group(function () {
         Route::delete('/products/{product}', [ProductController::class, 'destroy'])
             ->name('products.destroy');
@@ -81,7 +67,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-// Google OAuth Routes (add these with other auth routes)
+// Google OAuth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
@@ -98,6 +84,18 @@ Route::get('/payment/cancel', [StripePaymentController::class, 'cancel'])
     ->name('payment.cancel');
 
 
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])
+        ->name('cart.index');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])
+        ->name('cart.add');
+    Route::patch('/cart/{cart}', [CartController::class, 'update'])
+        ->name('cart.update');
+    Route::delete('/cart/{cart}', [CartController::class, 'remove'])
+        ->name('cart.remove');
+    Route::get('/cart/checkout', [CartController::class, 'checkout'])
+        ->name('cart.checkout');
+});
 
 
 
