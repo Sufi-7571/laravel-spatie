@@ -24,6 +24,10 @@
                         {{ __('Categories') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('payment.index')" :active="request()->routeIs('payment.*')" class="text-white hover:text-purple-200">
+                        {{ __('Payments') }}
+                    </x-nav-link>
+
                     @role('admin')
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" class="text-white hover:text-purple-200">
                             {{ __('Users') }}
@@ -99,6 +103,10 @@
 
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" class="text-white hover:bg-purple-700">
                 {{ __('Products') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('payment.index')" :active="request()->routeIs('payment.*')" class="text-white hover:bg-purple-700">
+                {{ __('Payments') }}
             </x-responsive-nav-link>
 
             @role('admin')

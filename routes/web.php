@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\StripePaymentController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -85,6 +86,16 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 });
+
+// Payment Routes
+Route::get('/payment', [StripePaymentController::class, 'index'])
+    ->name('payment.index');
+Route::post('/payment/process', [StripePaymentController::class, 'process'])
+    ->name('payment.process');
+Route::get('/payment/success', [StripePaymentController::class, 'success'])
+    ->name('payment.success');
+Route::get('/payment/cancel', [StripePaymentController::class, 'cancel'])
+    ->name('payment.cancel');
 
 
 
