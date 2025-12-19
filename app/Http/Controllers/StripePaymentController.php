@@ -23,18 +23,28 @@ class StripePaymentController extends Controller
     {
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        $session = Session::create([
-            'payment_method_types' => ['card'],
-            'line_items' => [[
+        // Get cart items for this user
+        $cartItems = Cart::where('user_id', auth()->id())->with('product')->get();
+
+        // Build line items array
+        $lineItems = [];
+        foreach ($cartItems as $item) {
+            $lineItems[] = [
                 'price_data' => [
                     'currency' => 'usd',
                     'product_data' => [
-                        'name' => $request->product_name ?? 'Product',
+                        'name' => $item->product->name,
+                        'images' => [$item->product->getImageUrl()],
                     ],
-                    'unit_amount' => $request->amount * 100,
+                    'unit_amount' => $item->product->price * 100,
                 ],
-                'quantity' => 1,
-            ]],
+                'quantity' => $item->quantity,
+            ];
+        }
+
+        $session = Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => $lineItems,
             'mode' => 'payment',
             'success_url' => route('payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('payment.cancel'),
@@ -42,8 +52,8 @@ class StripePaymentController extends Controller
 
         Payment::create([
             'user_id' => auth()->id(),
-            'stripe_session_id' => $session->id,  // This was missing
-            'product_name' => $request->product_name ?? 'Product',
+            'stripe_session_id' => $session->id,
+            'product_name' => $request->product_name ?? 'Cart Items',
             'amount' => $request->amount,
             'currency' => 'usd',
             'status' => 'pending'
