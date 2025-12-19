@@ -57,20 +57,55 @@
                         </div>
                     </div>
 
+                    <!-- Payment Items -->
+                    @if ($payment->paymentItems->count() > 0)
+                        <div class="mb-6">
+                            <h4 class="text-lg font-bold text-gray-900 mb-4">Order Items</h4>
+                            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th
+                                                class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                Product</th>
+                                            <th
+                                                class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                Price</th>
+                                            <th
+                                                class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                Quantity</th>
+                                            <th
+                                                class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        @foreach ($payment->paymentItems as $item)
+                                            <tr>
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center">
+                                                        <img class="h-10 w-10 rounded object-cover"
+                                                            src="{{ $item->product->getImageUrl() }}"
+                                                            alt="{{ $item->product_name }}">
+                                                        <span
+                                                            class="ml-3 text-sm font-medium text-gray-900">{{ $item->product_name }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-gray-900">
+                                                    ${{ number_format($item->price, 2) }}</td>
+                                                <td class="px-6 py-4 text-sm text-gray-900">{{ $item->quantity }}</td>
+                                                <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                                                    ${{ number_format($item->subtotal, 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-gray-50 rounded-lg p-4">
-                                <div class="flex items-center mb-2">
-                                    <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                    </svg>
-                                    <h4 class="text-sm font-semibold text-gray-700">Product</h4>
-                                </div>
-                                <p class="text-lg font-bold text-gray-900">{{ $payment->product_name }}</p>
-                            </div>
-
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <div class="flex items-center mb-2">
                                     <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor"
@@ -78,9 +113,9 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <h4 class="text-sm font-semibold text-gray-700">Amount</h4>
+                                    <h4 class="text-sm font-semibold text-gray-700">Total Amount</h4>
                                 </div>
-                                <p class="text-lg font-bold text-green-600">${{ number_format($payment->amount, 2) }}
+                                <p class="text-2xl font-bold text-green-600">${{ number_format($payment->amount, 2) }}
                                 </p>
                             </div>
 
@@ -108,6 +143,19 @@
                                 <p class="text-lg font-bold text-gray-900">{{ $payment->created_at->format('M d, Y') }}
                                 </p>
                                 <p class="text-xs text-gray-500">{{ $payment->created_at->format('h:i A') }}</p>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
+                                    <h4 class="text-sm font-semibold text-gray-700">Items Count</h4>
+                                </div>
+                                <p class="text-lg font-bold text-gray-900">{{ $payment->paymentItems->count() }} Items
+                                </p>
                             </div>
                         </div>
 

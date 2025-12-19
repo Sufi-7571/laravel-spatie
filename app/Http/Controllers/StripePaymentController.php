@@ -7,6 +7,7 @@ use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use App\Models\Cart;
 use App\Models\Payment;
+use App\Models\PaymentItem;
 
 class StripePaymentController extends Controller
 {
@@ -50,7 +51,8 @@ class StripePaymentController extends Controller
             'cancel_url' => route('payment.cancel'),
         ]);
 
-        Payment::create([
+        // Create payment record
+        $payment = Payment::create([
             'user_id' => auth()->id(),
             'stripe_session_id' => $session->id,
             'product_name' => $request->product_name ?? 'Cart Items',
@@ -58,6 +60,18 @@ class StripePaymentController extends Controller
             'currency' => 'usd',
             'status' => 'pending'
         ]);
+
+        // Save payment items
+        foreach ($cartItems as $item) {
+            PaymentItem::create([
+                'payment_id' => $payment->id,
+                'product_id' => $item->product_id,
+                'product_name' => $item->product->name,
+                'price' => $item->product->price,
+                'quantity' => $item->quantity,
+                'subtotal' => $item->product->price * $item->quantity
+            ]);
+        }
 
         return redirect($session->url);
     }
