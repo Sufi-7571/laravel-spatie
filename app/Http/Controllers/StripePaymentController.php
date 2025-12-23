@@ -167,4 +167,19 @@ class StripePaymentController extends Controller
 
         return redirect($session->url);
     }
+
+    public function destroy(Payment $payment)
+    {
+        if ($payment->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($payment->status === 'completed') {
+            return redirect()->route('payment.index')->with('error', 'Completed payments are not allowed to delete.');
+        }
+
+        $payment->delete();
+
+        return redirect()->route('payment.index')->with('success', 'Payment deleted successfully!');
+    }
 }

@@ -86,6 +86,8 @@ Route::get('/payment/{payment}', [StripePaymentController::class, 'show'])
     ->name('payment.show');
 Route::post('/payment/{payment}/retry', [StripePaymentController::class, 'retryPayment'])
     ->name('payment.retry');
+Route::delete('/payment/{payment}', [StripePaymentController::class, 'destroy'])
+    ->name('payment.destroy');
 
 
 Route::middleware('auth')->group(function () {
