@@ -84,6 +84,8 @@ Route::get('/payment/cancel', [StripePaymentController::class, 'cancel'])
     ->name('payment.cancel');
 Route::get('/payment/{payment}', [StripePaymentController::class, 'show'])
     ->name('payment.show');
+Route::post('/payment/{payment}/retry', [StripePaymentController::class, 'retryPayment'])
+    ->name('payment.retry');
 
 
 Route::middleware('auth')->group(function () {

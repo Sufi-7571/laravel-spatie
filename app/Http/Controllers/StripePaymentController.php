@@ -89,6 +89,11 @@ class StripePaymentController extends Controller
                 abort(403);
             }
 
+            // Check if already completed to prevent reuse
+            if ($payment->status === 'completed') {
+                return redirect()->route('payment.show', $payment)->with('info', 'This payment was already completed.');
+            }
+
             if ($payment->status === 'pending') {
                 $payment->update(['status' => 'completed']);
                 Cart::where('user_id', auth()->id())->delete();
@@ -112,5 +117,54 @@ class StripePaymentController extends Controller
         }
 
         return view('payment.show', compact('payment'));
+    }
+
+    public function retryPayment(Payment $payment)
+    {
+        if ($payment->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($payment->status !== 'pending') {
+            return redirect()->route('payment.index')->with('error', 'This payment cannot be retried.');
+        }
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        // Get payment items
+        $paymentItems = $payment->paymentItems;
+
+        if ($paymentItems->count() == 0) {
+            return redirect()->route('payment.index')->with('error', 'No items found for this payment.');
+        }
+
+        // Build line items array
+        $lineItems = [];
+        foreach ($paymentItems as $item) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'usd',
+                    'product_data' => [
+                        'name' => $item->product_name,
+                        'images' => [$item->product->getImageUrl()],
+                    ],
+                    'unit_amount' => $item->price * 100,
+                ],
+                'quantity' => $item->quantity,
+            ];
+        }
+
+        $session = Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => $lineItems,
+            'mode' => 'payment',
+            'success_url' => route('payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => route('payment.cancel'),
+        ]);
+
+        // Update payment with new session ID
+        $payment->update(['stripe_session_id' => $session->id]);
+
+        return redirect($session->url);
     }
 }
