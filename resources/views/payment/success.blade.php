@@ -18,16 +18,32 @@
                     </div>
 
                     <h3 class="text-3xl font-bold text-gray-900 mb-4">Payment Successful!</h3>
-                    <p class="text-gray-600 mb-8">Your payment has been processed successfully.</p>
+                    <p class="text-gray-600 mb-2">Your payment has been processed successfully.</p>
 
-                    <a href="{{ route('payment.index') }}"
-                        class="inline-flex items-center gap-2 gradient-bg text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Back to Payment
-                    </a>
+                    @if (isset($payment))
+                        <p class="text-lg font-semibold text-green-600 mb-8">Amount Paid:
+                            ${{ number_format($payment->amount, 2) }}</p>
+                    @endif
+
+                    <div class="flex gap-4 justify-center">
+                        <a href="{{ route('payment.index') }}"
+                            class="inline-flex items-center gap-2 gradient-bg text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            View All Payments
+                        </a>
+
+                        <a href="{{ route('products.index') }}"
+                            class="inline-flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            Continue Shopping
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

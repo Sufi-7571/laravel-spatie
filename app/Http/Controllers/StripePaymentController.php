@@ -80,13 +80,24 @@ class StripePaymentController extends Controller
     {
         if ($request->session_id) {
             $payment = Payment::where('stripe_session_id', $request->session_id)->first();
-            if ($payment) {
+
+            if (!$payment) {
+                return redirect()->route('payment.cancel')->with('error', 'Invalid payment session.');
+            }
+
+            if ($payment->user_id !== auth()->id()) {
+                abort(403);
+            }
+
+            if ($payment->status === 'pending') {
                 $payment->update(['status' => 'completed']);
                 Cart::where('user_id', auth()->id())->delete();
             }
+
+            return view('payment.success', compact('payment'));
         }
 
-        return view('payment.success');
+        return redirect()->route('payment.index')->with('error', 'Invalid payment session.');
     }
 
     public function cancel()
